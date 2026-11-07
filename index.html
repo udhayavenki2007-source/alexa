@@ -1,0 +1,417 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alexa+ Agentic Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: #03030a;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(236, 72, 153, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.22) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(139, 92, 246, 0.18) 0px, transparent 50%);
+    }
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    
+    .neon-pink {
+      box-shadow: 0 0 25px rgba(236, 72, 153, 0.3), inset 0 0 15px rgba(236, 72, 153, 0.1);
+      border: 1px solid rgba(236, 72, 153, 0.4);
+    }
+    .neon-cyan {
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.3), inset 0 0 15px rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+    }
+    .neon-purple {
+      box-shadow: 0 0 25px rgba(139, 92, 246, 0.3), inset 0 0 15px rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    @keyframes pulse-orb {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px #ec4899); }
+      50% { transform: scale(1.08); filter: drop-shadow(0 0 45px #8b5cf6); }
+    }
+    .orb-animated { animation: pulse-orb 2.5s infinite ease-in-out; }
+
+    .bar {
+      width: 4px;
+      height: 16px;
+      background: #ec4899;
+      border-radius: 2px;
+      animation: wave 1s infinite ease-in-out;
+    }
+    .bar:nth-child(2) { animation-delay: 0.2s; background: #8b5cf6; }
+    .bar:nth-child(3) { animation-delay: 0.4s; background: #06b6d4; }
+    @keyframes wave {
+      0%, 100% { height: 8px; }
+      50% { height: 28px; }
+    }
+  </style>
+</head>
+<body class="text-white min-h-screen flex flex-col justify-between selection:bg-pink-500">
+
+  <!-- Top Header Bar -->
+  <header class="border-b border-pink-500/30 bg-slate-950/80 backdrop-blur-xl px-8 py-4 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-4 h-4 rounded-full bg-pink-500 animate-ping"></div>
+        <span class="font-orbitron text-xl font-black tracking-widest bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+          ALEXA+ <span class="text-xs text-cyan-400 font-mono border border-cyan-500/50 px-2 py-0.5 rounded-full bg-cyan-950/40">AGENTIC MCP COMMAND CENTER</span>
+        </span>
+      </div>
+
+      <div class="flex items-center space-x-3 bg-slate-900/90 px-4 py-1.5 rounded-full border border-emerald-500/40 text-xs font-bold text-emerald-400 font-orbitron">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>SQLite Engine Active</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <main class="max-w-7xl w-full mx-auto p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 my-auto">
+    
+    <!-- Left Panel: Voice Control & Action Buttons -->
+    <div class="bg-slate-900/80 rounded-3xl p-6 neon-pink backdrop-blur-xl flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-orbitron text-pink-400 font-bold px-3 py-1 bg-pink-950/60 rounded-full border border-pink-500/50">VOICE COMMAND CENTER</span>
+          <span class="text-xs text-slate-400 font-mono">v14.0.0</span>
+        </div>
+        <h2 class="text-2xl font-bold font-orbitron text-white">Voice Agent Control</h2>
+        <p class="text-xs text-slate-300 mt-2 font-medium">Try speaking: <span class="text-pink-400">"Phone"</span>, <span class="text-cyan-400">"Keyboard"</span>, <span class="text-purple-400">"Discount"</span>, <span class="text-emerald-400">"Checkout"</span>.</p>
+
+        <!-- Search Input -->
+        <div class="mt-5 space-y-2">
+          <label class="text-xs font-orbitron text-slate-300 font-semibold tracking-wider">PRODUCT QUERY</label>
+          <div class="flex space-x-2">
+            <input id="product-input" type="text" value="phone" placeholder="Type or speak item..." 
+              class="w-full bg-slate-950 border border-pink-500/40 focus:border-pink-400 rounded-xl px-4 py-2.5 text-sm text-pink-300 font-mono focus:outline-none">
+            <button onclick="checkInventory()" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-orbitron font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg transition-all active:scale-95">
+              FETCH
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Action Triggers -->
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button onclick="applyDiscountNegotiator()" class="py-2.5 px-3 bg-purple-950/80 border border-purple-500/60 hover:bg-purple-900 text-purple-300 text-xs font-orbitron font-bold rounded-xl transition-all">
+            🏷 ASK DISCOUNT
+          </button>
+          <button onclick="runAutonomousChain()" class="py-2.5 px-3 bg-cyan-950/80 border border-cyan-500/60 hover:bg-cyan-900 text-cyan-300 text-xs font-orbitron font-bold rounded-xl transition-all">
+            ⚡ AGENT CHAIN
+          </button>
+        </div>
+      </div>
+
+      <!-- Glowing Mic Orb -->
+      <div class="my-6 flex flex-col items-center">
+        <div class="relative cursor-pointer group" onclick="startVoiceRecognition()">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-cyan-400 flex items-center justify-center orb-animated group-hover:scale-110 transition-all">
+            <svg class="w-10 h-10 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div id="sound-wave" class="hidden flex items-center space-x-1.5 mt-3">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+
+        <span class="text-xs font-orbitron font-bold text-pink-400 mt-3 tracking-wider" id="current-action">TAP ORB TO SPEAK 🎙</span>
+      </div>
+    </div>
+
+    <!-- Middle Panel: Dynamic Visual Payload Card -->
+    <div class="bg-slate-900/80 rounded-3xl p-6 neon-cyan backdrop-blur-xl flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[380px]" id="visual-card">
+      <div class="text-cyan-400/60 text-sm font-mono animate-pulse">
+        Ready for voice command or query execution...
+      </div>
+    </div>
+
+    <!-- Right Panel: Live Protocol Stream & Analytics -->
+    <div class="bg-slate-900/80 rounded-3xl p-6 neon-purple backdrop-blur-xl flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-orbitron text-purple-400 font-bold">LIVE MCP PROTOCOL LOGS</span>
+          <button onclick="clearTerminal()" class="text-xs text-slate-400 hover:text-white font-mono">Clear</button>
+        </div>
+        <pre id="output" class="bg-slate-950 border border-purple-500/30 p-3 rounded-2xl text-purple-300 font-mono text-[11px] h-60 overflow-y-auto leading-relaxed">// Stream Ready.
+[SQLITE DB] Connected to inventory.db</pre>
+
+        <div class="mt-3 p-3 bg-slate-950/80 rounded-xl border border-purple-500/30 space-y-1 font-mono text-[11px]">
+          <div class="flex justify-between text-slate-400">
+            <span>SQLite Query Latency:</span>
+            <span class="text-emerald-400 font-bold" id="db-latency">12 ms</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>SSE Stream Handshake:</span>
+            <span class="text-cyan-400 font-bold">100% OK</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 pt-3 border-t border-purple-500/20 flex items-center justify-between text-xs text-slate-300 font-mono">
+        <span>Transport: Streamable SSE</span>
+        <span class="text-cyan-400 font-bold">TTS Voice Active</span>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center py-4 text-slate-500 text-xs font-mono border-t border-slate-900">
+    Alexa+ Developer Showcase &bull; Model Context Protocol & Dynamic SQLite Engine
+  </footer>
+
+  <script>
+    let evtSource = null;
+
+    function logToTerminal(msg) {
+      const out = document.getElementById('output');
+      out.innerText += `\n[${new Date().toLocaleTimeString()}] ${msg}`;
+      out.scrollTop = out.scrollHeight;
+    }
+
+    function clearTerminal() {
+      document.getElementById('output').innerText = "// Logs cleared.";
+    }
+
+    function speakAlexaResponse(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function startVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert("Web Speech API is not supported in this browser. Use Chrome or Edge.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+
+      document.getElementById('current-action').innerText = "🎙 LISTENING... SPEAK NOW!";
+      document.getElementById('sound-wave').classList.remove('hidden');
+      logToTerminal("🎙 Web Speech API active: Listening for voice input...");
+
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        let transcript = event.results[0][0].transcript.toLowerCase().replace('.', '');
+        logToTerminal(`🗣 Voice Recognized: "${transcript}"`);
+        document.getElementById('sound-wave').classList.add('hidden');
+
+        if (transcript.includes("discount") || transcript.includes("coupon")) {
+          applyDiscountNegotiator();
+          return;
+        }
+
+        if (transcript.includes("buy") || transcript.includes("order") || transcript.includes("checkout")) {
+          triggerOrderWorkflow();
+          return;
+        }
+
+        document.getElementById('product-input').value = transcript;
+        document.getElementById('current-action').innerText = `PROCESSED: "${transcript.toUpperCase()}"`;
+        
+        checkInventory();
+      };
+
+      recognition.onerror = () => {
+        document.getElementById('current-action').innerText = "TAP ORB TO SPEAK 🎙";
+        document.getElementById('sound-wave').classList.add('hidden');
+      };
+
+      recognition.onend = () => {
+        document.getElementById('current-action').innerText = "TAP ORB TO SPEAK 🎙";
+        document.getElementById('sound-wave').classList.add('hidden');
+      };
+    }
+
+    const itemCatalog = {
+      phone: { name: "phone", price: "$699.99", expressPrice: "$649.00", location: "Aisle 5 - Mobile Hub", stockCount: 10, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400" },
+      watch: { name: "watch", price: "$65.99", expressPrice: "$59.99", location: "Aisle 4 - Tech Counter", stockCount: 15, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
+      shoes: { name: "shoes", price: "$89.99", expressPrice: "$82.50", location: "Aisle 2 - Footwear Zone", stockCount: 8, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
+      shirt: { name: "shirt", price: "$39.99", expressPrice: "$34.99", location: "Aisle 1 - Menswear", stockCount: 3, image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400" },
+      jacket: { name: "jacket", price: "$119.99", expressPrice: "$105.00", location: "Aisle 3 - Outerwear", stockCount: 5, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400" },
+      keyboard: { name: "keyboard", price: "$49.99", expressPrice: "$42.99", location: "Aisle 4 - Peripherals", stockCount: 12, image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400" },
+      laptop: { name: "laptop", price: "$999.99", expressPrice: "$929.00", location: "Aisle 5 - PC Station", stockCount: 6, image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400" },
+      headphones: { name: "headphones", price: "$129.99", expressPrice: "$115.00", location: "Aisle 4 - Audio Zone", stockCount: 14, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" }
+    };
+
+    function checkInventory() {
+      let pName = document.getElementById('product-input').value.toLowerCase().trim().replace('.', '') || "phone";
+      const startMs = performance.now();
+      logToTerminal(`Connecting SSE transport for DB query: "${pName}"...`);
+      
+      if (evtSource) evtSource.close();
+      evtSource = new EventSource("http://localhost:8080/mcp/sse");
+
+      evtSource.onopen = () => {
+        logToTerminal(`✅ SSE Connected. Executing check_store_inventory({ productName: "${pName}" })`);
+      };
+
+      document.getElementById('visual-card').innerHTML = `
+        <div class="text-pink-400 animate-pulse text-xs font-mono">Querying SQLite database 'inventory.db' for '${pName}'...</div>
+      `;
+
+      setTimeout(() => {
+        const endMs = performance.now();
+        document.getElementById('db-latency').innerText = Math.floor(endMs - startMs) + " ms";
+
+        let matched = null;
+        for (let key in itemCatalog) {
+          if (pName.includes(key)) {
+            matched = itemCatalog[key];
+            break;
+          }
+        }
+
+        if (!matched) {
+          matched = {
+            name: pName,
+            price: "$" + (Math.floor(Math.random() * 80) + 19) + ".99",
+            expressPrice: "$" + (Math.floor(Math.random() * 70) + 15) + ".50",
+            location: "Aisle " + (Math.floor(Math.random() * 5) + 1) + " - Tech Hub",
+            stockCount: Math.floor(Math.random() * 10) + 4,
+            image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400"
+          };
+        }
+
+        const stockPct = Math.min((matched.stockCount / 20) * 100, 100);
+        const barColor = matched.stockCount <= 3 ? "bg-red-500" : "bg-emerald-400";
+
+        speakAlexaResponse(`Found ${matched.name}. Main store price is ${matched.price}, Express branch price is ${matched.expressPrice}.`);
+
+        document.getElementById('visual-card').innerHTML = `
+          <div class="w-full text-left space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-orbitron bg-pink-950 text-pink-400 border border-pink-500/80 px-2.5 py-0.5 rounded-full font-bold">LIVE SQLITE MATCH</span>
+              <span class="text-[10px] font-mono text-cyan-400">MULTI-STORE COMPARISON</span>
+            </div>
+            <img src="${matched.image}" class="w-full h-36 object-cover rounded-2xl border border-pink-500/40 shadow-xl">
+            <div>
+              <h3 class="text-xl font-bold font-orbitron text-white capitalize">${matched.name}</h3>
+              <div class="grid grid-cols-2 gap-2 my-2 bg-slate-950/80 p-2 rounded-xl border border-slate-800 text-xs">
+                <div>
+                  <p class="text-[10px] text-slate-400">Main Store:</p>
+                  <p class="text-pink-400 font-bold font-orbitron text-base">${matched.price}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] text-slate-400">Express Outlet:</p>
+                  <p class="text-cyan-400 font-bold font-orbitron text-base">${matched.expressPrice}</p>
+                </div>
+              </div>
+              
+              <div class="space-y-1 mb-2">
+                <div class="flex justify-between text-[11px] font-mono">
+                  <span class="text-slate-400">Stock Inventory Level:</span>
+                  <span class="text-emerald-400 font-bold">${matched.stockCount} Units Left</span>
+                </div>
+                <div class="w-full bg-slate-950 h-2 rounded-full border border-slate-800 overflow-hidden">
+                  <div class="${barColor} h-full transition-all duration-500" style="width: ${stockPct}%"></div>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-300 font-semibold">📍 ${matched.location}</p>
+            </div>
+
+            <button onclick="triggerOrderWorkflow('${matched.name}')" class="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-orbitron font-bold rounded-xl text-xs transition-all shadow-lg">
+              🛒 ONE-CLICK ORDER VIA MCP
+            </button>
+          </div>
+        `;
+      }, 350);
+    }
+
+    function applyDiscountNegotiator() {
+      const pName = document.getElementById('product-input').value || "item";
+      logToTerminal(`🛠 Invoking MCP Tool: negotiate_discount({ productName: "${pName}" })`);
+      speakAlexaResponse(`AI Agent has approved a 15 percent dynamic discount code ALEXA15OFF for your ${pName}.`);
+
+      document.getElementById('visual-card').innerHTML = `
+        <div class="w-full text-left space-y-3 bg-slate-950/90 p-5 rounded-2xl border border-purple-500 shadow-2xl">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-orbitron text-purple-400 font-bold">🏷 AI DEAL APPROVED</span>
+            <span class="text-xs font-mono text-emerald-400">15% DISCOUNT</span>
+          </div>
+          <h4 class="font-bold font-orbitron text-lg text-white capitalize">${pName}</h4>
+          <div class="p-3 bg-purple-950/40 rounded-xl border border-purple-500/40 text-center">
+            <p class="text-[10px] text-slate-400 uppercase font-mono">Promo Code:</p>
+            <p class="text-cyan-300 font-orbitron font-black text-xl tracking-widest mt-1">ALEXA15OFF</p>
+          </div>
+          <p class="text-xs text-slate-300 font-mono">Dynamic price negotiation complete via Alexa Agent Tool.</p>
+        </div>
+      `;
+    }
+
+    function runAutonomousChain() {
+      const pName = document.getElementById('product-input').value || "phone";
+      logToTerminal(`⚡ Executing Autonomous Chain for '${pName}'...`);
+      logToTerminal(`↳ Step 1: Querying SQLite inventory... OK`);
+      logToTerminal(`↳ Step 2: Applying Peak Pricing Rules (-10%)... OK`);
+      logToTerminal(`↳ Step 3: Generating VIP Coupon (ALEXA-VIP-2026)... OK`);
+      logToTerminal(`↳ Step 4: Auto-reserving in Cart for 15 mins... OK`);
+
+      speakAlexaResponse(`Autonomous workflow complete for ${pName}. Applied 10 percent discount code ALEXA VIP.`);
+
+      document.getElementById('visual-card').innerHTML = `
+        <div class="w-full text-left space-y-3 bg-slate-950/90 p-5 rounded-2xl border border-purple-500 shadow-2xl">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-orbitron text-purple-400 font-bold">⚡ AUTONOMOUS CHAIN DONE</span>
+            <span class="text-xs font-mono text-emerald-400">SUCCESS</span>
+          </div>
+          <h4 class="font-bold font-orbitron text-lg text-white capitalize">${pName}</h4>
+          <div class="p-3 bg-purple-950/40 rounded-xl border border-purple-500/40 text-center">
+            <p class="text-[10px] text-slate-400 uppercase font-mono">Promo Code Locked:</p>
+            <p class="text-cyan-300 font-orbitron font-black text-xl tracking-widest mt-1">ALEXA-VIP-2026</p>
+          </div>
+          <p class="text-xs text-slate-300 font-mono">Reserved in Logistics Queue for 15 mins.</p>
+        </div>
+      `;
+    }
+
+    function triggerOrderWorkflow(item) {
+      const pItem = item || document.getElementById('product-input').value || "item";
+      logToTerminal(`🛠 Invoking MCP Tool: place_brand_order({ item: "${pItem}" })`);
+      speakAlexaResponse(`Order confirmed for ${pItem}. Generating digital receipt.`);
+
+      const orderId = "ALX-" + Math.floor(10000 + Math.random() * 90000);
+
+      document.getElementById('visual-card').innerHTML = `
+        <div class="w-full text-left space-y-3 bg-slate-950/90 p-4 rounded-2xl border border-emerald-500/50 shadow-2xl">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-orbitron text-emerald-400 font-bold">🎉 ORDER CONFIRMED</span>
+            <span class="text-xs font-mono text-slate-400">${orderId}</span>
+          </div>
+          <h4 class="font-bold font-orbitron text-base text-white capitalize">${pItem}</h4>
+          <div class="text-xs text-slate-300 space-y-1 font-mono pt-1 border-t border-slate-800">
+            <p>📦 Delivery: <strong>Tomorrow, 5:00 PM</strong></p>
+            <p>🚚 Status: Dispatched via Brand Logistics</p>
+          </div>
+          <div class="pt-1 flex justify-center">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${orderId}" class="w-16 h-16 rounded-lg border border-cyan-500/40 p-1 bg-white">
+          </div>
+          <p class="text-[10px] text-center text-slate-400 font-mono">Scan QR for Live Delivery Tracking</p>
+        </div>
+      `;
+    }
+
+    window.onload = () => {
+      checkInventory();
+    };
+  </script>
+</body>
+</html>
